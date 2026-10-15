@@ -1,4 +1,3 @@
-// AFRIÉ Parfums — JavaScript Native (tanpa framework)
 "use strict";
 const menuToggle = document.getElementById("menuToggle");
 const navLinks = document.getElementById("navLinks");
@@ -16,8 +15,7 @@ const toast = document.getElementById("toast");
 const contactForm = document.getElementById("contactForm");
 const formStatus = document.getElementById("formStatus");
 
-// Ganti dengan nomor WhatsApp toko yang aktif. Format: kode negara tanpa +, spasi, atau strip.
-// Contoh format Indonesia: 6281234567890
+
 const WHATSAPP_NUMBER = "6285828487182";
 const products = { "AFRIÉ Noir": 350000, "AFRIÉ Éclat": 320000, "AFRIÉ Ambre": 380000 };
 const cart = {};
@@ -69,10 +67,55 @@ checkoutButton.addEventListener("click", () => {
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
 });
 
-// Validasi formulir kontak di browser.
+//Formulir kontak di browser.
 const validators = { name: value => value.trim().length >= 2 ? "" : "Nama minimal 2 karakter.", email: value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) ? "" : "Masukkan alamat email yang valid.", topic: value => value ? "" : "Silakan pilih topik pesan.", message: value => value.trim().length >= 10 ? "" : "Pesan minimal 10 karakter." };
 Object.keys(validators).forEach(name => { const field = document.getElementById(name); field.addEventListener("input", () => validateField(name)); field.addEventListener("change", () => validateField(name)); });
 function validateField(name) { const field = document.getElementById(name); const error = document.getElementById(`${name}Error`); const message = validators[name](field.value); error.textContent = message; field.setAttribute("aria-invalid", String(Boolean(message))); return !message; }
-contactForm.addEventListener("submit", event => { event.preventDefault(); const fields = Object.keys(validators); if (!fields.map(validateField).every(Boolean)) { formStatus.textContent = "Periksa kembali kolom yang masih perlu diperbaiki."; const first = fields.find(name => !validators[name](document.getElementById(name).value)); document.getElementById(first).focus(); return; } formStatus.textContent = "Terima kasih! Formulir demo berhasil divalidasi."; showToast("Pesan demo berhasil divalidasi. Data tidak dikirim ke server."); contactForm.reset(); fields.forEach(name => { document.getElementById(`${name}Error`).textContent = ""; document.getElementById(name).setAttribute("aria-invalid", "false"); }); });
-document.getElementById("year").textContent = String(new Date().getFullYear());
-renderCart();
+
+contactForm.addEventListener("submit", event => {
+  event.preventDefault();
+  const fields = Object.keys(validators);
+  if (!fields.map(validateField).every(Boolean)) {
+    formStatus.textContent =
+      "Periksa kembali kolom yang masih perlu diperbaiki.";
+
+    const first = fields.find(name =>
+      !validators[name](document.getElementById(name).value)
+    );
+
+    document.getElementById(first).focus();
+    return;
+  }
+
+  const nama = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const topic = document.getElementById("topic").value;
+  const pesan = document.getElementById("message").value.trim();
+
+  const nomorWhatsApp = "6285828487182";
+
+  const isiPesan =
+    "Halo AFRIÉ Parfums!\n\n" +
+    "Nama: " + nama + "\n" +
+    "Email: " + email + "\n" +
+    "Topik: " + topic + "\n" +
+    "Pesan: " + pesan;
+
+  const linkWhatsApp =
+    "https://wa.me/" + nomorWhatsApp +
+    "?text=" + encodeURIComponent(isiPesan);
+
+  window.open(linkWhatsApp, "_blank");
+
+  formStatus.textContent =
+    "Pesan siap dikirim melalui WhatsApp.";
+
+  showToast("WhatsApp dibuka. Tekan Kirim untuk mengirim pesan.");
+
+  contactForm.reset();
+
+  fields.forEach(name => {
+    document.getElementById(name + "Error").textContent = "";
+    document.getElementById(name).setAttribute("aria-invalid", "false");
+  });
+});
